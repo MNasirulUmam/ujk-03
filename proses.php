@@ -31,7 +31,7 @@
             header("Location: layouts/home.php");  // Mengarahkan pengguna ke halaman home.php
     
         }else{
-            header("Location: index.php"); // Mengarahkan pengguna ke halaman login.php jika query tidak mengembalikan baris data.
+            header("Location: login.php"); // Mengarahkan pengguna ke halaman login.php jika query tidak mengembalikan baris data.
         }  
 
     }

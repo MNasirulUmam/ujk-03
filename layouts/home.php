@@ -11,40 +11,50 @@
     
     // query mengambil database abouts
 
-    $queryUsers = "SELECT * FROM users";
+    $queryUsers = "SELECT * FROM users WHERE username = '$_SESSION[name]'";
     $result = mysqli_query($koneksi, $queryUsers); // Menjalankan query menggunakan fungsi mysqli_query dengan menggunakan koneksi '$koneksi'.
     $row = mysqli_fetch_assoc($result);  
 
     $queryJurusan = "SELECT * FROM kejuruan";
     $dataJurusan = mysqli_query($koneksi, $queryJurusan);
+
+    $querySiswa = "SELECT *,siswa.id as id_siswa FROM siswa join kejuruan on siswa.kejuruan_id = kejuruan.id order by siswa.id asc;";
+    $dataSiswa = mysqli_query($koneksi, $querySiswa);
     // var_dump($row);
     // die;   
     if(isset($_POST["simpan"])) { 
-        $username  = $_POST["username"];
-        $email     = $_POST["email"];
+        
         $tgl_pdf   = $_POST["tgl_pdf"];
         $nama      = $_POST["nama"];   
         $tempat    = $_POST["tempat"]; 
         $tgl_lhr   = $_POST["tgl_lhr"];
         $alamat    = $_POST["alamat"];
+        $no_hp     = $_POST["no_hp"];
         $jenis_kl  = $_POST["jenis_kl"];
         $sekolah   = $_POST["sekolah"];
         $kejuruan_id  = $_POST["kejuruan_id"];
-        // $user_id   = $_POST["user_id"];
+        // $users_id   = $_POST["users_id"];
         $id        = $_POST["id"];
-        if(empty($tgl_pdf) || empty($nama) || empty($tempat) || empty($tgl_lhr) || empty($alamat) || empty($jenis_kl) || empty($sekolah) || empty($kejuruan_id)) {
+        if(empty($tgl_pdf) || empty($nama) || empty($tempat) || empty($tgl_lhr) || empty($alamat)  || empty($no_hp) || empty($jenis_kl) || empty($sekolah) || empty($kejuruan_id)) {
             $erros = "data harus di isi";
             // var_dump($erros);
         }else{
-            // if (!empty($age) && $age < 18) {
-            //     $uploadOk = 0;
-            //     $hasil = "Umur harus lebih dari atau sama dengan 18 tahun";
-            // } else {
+            $userId = $row['id'];
+
+            // $queryCheck = "SELECT users.username FROM users LEFT JOIN siswa ON users.id = siswa.users_id WHERE users.username = '$_SESSION[name]'";
+            $queryCheck = "SELECT users_id FROM siswa where users_id = '$userId'";
+            $resultCheck = mysqli_query($koneksi, $queryCheck);
+            $dataCheck = mysqli_fetch_assoc($resultCheck);
+            if ($dataCheck != null) {
+                $uploadOk = 0;
+                $hasil = "user sudah terdaftar";
+            } else {
                 if(empty($id)){
-                    $user_id = "select max(id) from users";
-                    $query1 = mysqli_query($koneksi,$user_id)->fetch_array(MYSQLI_NUM);
-                    $queryInsert = "INSERT INTO students ( name, address, gaender, handphone, birth, age, user_id) VALUES ('$name','$address','$gaender','$handphone','$birth','$age','$query1[0]')";
+                    $users_id = "SELECT id  from users where username = '$_SESSION[name]'";
+                    $query1 = mysqli_query($koneksi,$users_id)->fetch_array(MYSQLI_NUM);
+                    $queryInsert = "INSERT INTO siswa (id, tgl_pdf, nama, tempat, tgl_lhr, alamat, no_hp, jenis_kl, sekolah, kejuruan_id, users_id) VALUES (null, '$tgl_pdf','$nama','$tempat','$tgl_lhr','$alamat','$no_hp','$jenis_kl','$sekolah','$kejuruan_id','$query1[0]')";
                     $insert = mysqli_query($koneksi,$queryInsert);
+                    // var_dump($insert);
                     if($insert){
                         $uploadOk = 1;
                         $hasil = "Student successfully uploaded";
@@ -53,17 +63,17 @@
                         $hasil = "Student fail uploaded";   
                     }
                 }else{
-                    $queryUpdate = "UPDATE students SET name='$name', address ='$address', gaender ='$gaender', handphone ='$handphone', birth ='$birth' , age ='$age' WHERE id = '$id'";
-                    $insert = mysqli_query($koneksi,$queryUpdate);
-                    if($insert){
-                        $uploadOk = 2;
-                        $hasil = "Student successfully uploaded";
-                    }else{
-                        $uploadOk = 0;
-                        $hasil = "Student fail uploaded";   
-                    }
+                    // $queryUpdate = "UPDATE siswa SET name='$name', address ='$address', gaender ='$gaender', handphone ='$handphone', birth ='$birth' , age ='$age' WHERE id = '$id'";
+                    // $insert = mysqli_query($koneksi,$queryUpdate);
+                    // if($insert){
+                    //     $uploadOk = 2;
+                    //     $hasil = "Student successfully uploaded";
+                    // }else{
+                    //     $uploadOk = 0;
+                    //     $hasil = "Student fail uploaded";   
+                    // }
                 }
-            // }
+            }
         }
 
         // var_dump($title);
@@ -148,31 +158,31 @@
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Tanggal Pendaftaran</label>
-                                        <input type="text" class="form-control" name="name" id="" value="">
+                                        <input type="date" class="form-control" name="tgl_pdf" id="" value="">
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Nama</label>
-                                        <input type="text" class="form-control" name="name" id="" value="">
+                                        <input type="text" class="form-control" name="nama" id="" value="">
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Tempat</label>
-                                        <input type="text" class="form-control" name="address" id=""></input>
+                                        <input type="text" class="form-control" name="tempat" id=""></input>
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Tanggal Lahir</label>
-                                        <input type="date" class="form-control" name="birth" id="" value="">
+                                        <input type="date" class="form-control" name="tgl_lhr" id="" value="">
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Alamat</label>
-                                        <textarea type="text" class="form-control" name="address" id=""></textarea>
+                                        <textarea type="text" class="form-control" name="alamat" id=""></textarea>
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Nomer HP</label>
-                                        <input type="text" class="form-control" name="handphone" id="" value="">
+                                        <input type="text" class="form-control" name="no_hp" id="" value="">
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Jenis Kelamin</label>
-                                        <select class="form-control" name="gaender" id="gaender">
+                                        <select class="form-control" name="jenis_kl" id="">
                                             <option value="">--Pilih--</option>
                                             <option value="L">Laki-laki</option>
                                             <option value="P">Perempuan</option>
@@ -180,7 +190,7 @@
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Asal Sekolah</label>
-                                        <input type="text" class="form-control" name="age" id="" value="">
+                                        <input type="text" class="form-control" name="sekolah" id="" value="">
                                     </div>
                                     <div class="col-6 mb-2">
                                         <label class="form-label">Kejuruan</label>
@@ -197,6 +207,53 @@
                                     <input type="submit" name="simpan" class="btn btn-primary"></input>
                                     <a href="<?php $_SERVER['PHP_SELF']; ?>" class="btn btn-secondary">Refresh</a>
                             </form>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal Pendaftaran</th>
+                                        <th>Nama</th>
+                                        <th>Tempat</th>
+                                        <th>Tanggal Lahir</th>
+                                        <th>Alamat</th>
+                                        <th>Jenis Kelamina</th>
+                                        <th>No HP</th>
+                                        <th>Sekolah</th>
+                                        <th>Kejuruan</th>
+                                        <th>Akasi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $no=1;
+                                    foreach($dataSiswa as $datas){
+                                        echo "<tr>";
+                                            echo "<td>{$no}</td>";
+                                            echo "<td>{$datas['tgl_pdf']}</td>";
+                                            echo "<td>{$datas['nama']}</td>";
+                                            echo "<td>{$datas['tempat']}</td>";
+                                            echo "<td>{$datas['tgl_lhr']}</td>";
+                                            echo "<td>{$datas['alamat']}</td>";
+                                            echo "<td>{$datas['no_hp']}</td>";
+                                            echo "<td>{$datas['jenis_kl']}</td>";
+                                            echo "<td>{$datas['sekolah']}</td>";
+                                            echo "<td>{$datas['kejuruan']}</td>";
+                                            ?>
+                                            <?php echo "<td>";?>
+                                                <a class="btn btn-info" href="">Update</a>
+                                                <form onsubmit="return confirm('Apakah yaknik mau dihapus?')" method="post" action="">
+                                                    <input type="hidden" name="id" value="<?php echo $datas['id'];?>">
+                                                    <input type="submit" name="hapus" value= "Delate" class="btn btn-danger">
+                                                </form>
+                                                </td>
+                                        <?php echo "</tr>";
+                                        $no++;
+                                    }
+                                    ?>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 

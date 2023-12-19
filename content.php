@@ -32,7 +32,7 @@
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle text-gray-100" href="#" id="userDropdown" role="button"
                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <?php echo $dataUser['username']?>
+                <?php echo $_SESSION['name']?>
             </a>
             <!-- Dropdown - User Information -->
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
